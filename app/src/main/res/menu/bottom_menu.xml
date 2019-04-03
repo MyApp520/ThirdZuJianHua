@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/chat"
+        android:enabled="true"
+        android:icon="@mipmap/tab_chat_normal_nor"
+        android:title="消息"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/group"
+        android:enabled="true"
+        android:icon="@mipmap/tab_group_normal_nor"
+        android:title="通讯录"
+        app:showAsAction="ifRoom" />
+    <!-- 导航栏中间放一张图片，然后在xml布局中将图片控件，覆盖在BottomNavigation 之上 -->
+    <!--<item-->
+        <!--android:id="@+id/navigation_center"-->
+        <!--android:icon="@null"-->
+        <!--android:title="" />-->
+    <item
+        android:id="@+id/find"
+        android:enabled="true"
+        android:icon="@mipmap/tab_find_normal_nor"
+        android:title="发现"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/mine"
+        android:enabled="true"
+        android:icon="@mipmap/tab_my_normal_nor"
+        android:title="我"
+        app:showAsAction="ifRoom" />
+</menu>

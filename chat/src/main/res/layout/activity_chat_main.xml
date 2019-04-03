@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.chat.ui.ChatMainActivity">
+
+    <TextView
+        android:id="@+id/tv_chat_toast1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="聊天界面111"
+        android:textSize="60sp"/>
+
+    <TextView
+        android:id="@+id/tv_chat_toast2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="聊天界面222"
+        android:textSize="60sp"/>
+
+</LinearLayout>

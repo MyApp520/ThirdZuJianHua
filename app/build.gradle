@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
+
+    defaultConfig {
+        applicationId "second.zujian.hua"
+        minSdkVersion 18
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == 'com.android.support') {
+                if (!requested.name.startsWith("multidex")) {
+                    details.useVersion '27.1.1'
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(':commonlib')
+    if(!isNeedChatModule.toBoolean()) {
+        implementation project(':chat')
+    }
+    if(!isNeedGroupModule.toBoolean()) {
+        implementation project(':group')
+    }
+    if(!isNeedFindModule.toBoolean()) {
+        implementation project(':find')
+    }
+    if(!isNeedMineModule.toBoolean()) {
+        implementation project(':mine')
+    }
+
+    // 引入butterknife
+    annotationProcessor('com.jakewharton:butterknife-compiler:8.8.1') {
+        exclude group: 'support-annotations'
+        exclude group: 'support-v7'
+        exclude group: 'support-v4'
+    }
+    // 引入arouter
+    annotationProcessor('com.alibaba:arouter-compiler:1.2.2') {
+        exclude group: 'support-annotations'
+        exclude group: 'support-v7'
+        exclude group: 'support-v4'
+    }
+    //引入dagger2和dagger2-android
+    annotationProcessor rootProject.ext.dependencies["dagger2-compiler"]
+    annotationProcessor rootProject.ext.dependencies["dagger2-android-processor"]
+}
