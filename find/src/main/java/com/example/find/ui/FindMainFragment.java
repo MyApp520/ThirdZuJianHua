@@ -16,6 +16,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.BDLocationService;
 import com.baidu.mapapi.clusterutil.clustering.ClusterItem;
+import com.baidu.mapapi.clusterutil.clustering.ClusterManager;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -33,7 +34,9 @@ import com.example.commonlib.util.UIUtils;
 import com.example.find.R;
 import com.example.find.R2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -79,10 +82,17 @@ public class FindMainFragment extends BaseFragment {
     private LatLng rightTopLatlng, leftBottomLatlng;
     private HashMap<Integer, Integer> mapZoomScale = new HashMap<>();// 地图缩放层级比例尺对应的距离
 
+    private List<BaiDuMapMarkerItem> allCameraMarkerItems = new ArrayList<>();
+    private List<BaiDuMapMarkerItem> needCameraMarkerItems = new ArrayList<>();
+
     /**
      * 发起百度地图定位的时间
      */
     private long startBDLocationTime;
+    /**
+     * 百度地图聚合点管理类
+     */
+    private ClusterManager<BaiDuMapMarkerItem> mClusterManager;
 
 
     @Override
@@ -146,6 +156,30 @@ public class FindMainFragment extends BaseFragment {
         if (mBDLocationService != null) {
             mBDLocationService.stopBDLocation();
         }
+    }
+
+    /**
+     * 重新添加聚合点marker
+     */
+    private void reloadClusterMarker() {
+        needCameraMarkerItems.clear();
+        for (BaiDuMapMarkerItem cameraMarkerItem : allCameraMarkerItems) {
+            double markerLat = cameraMarkerItem.getPosition().latitude;
+            double markerLng = cameraMarkerItem.getPosition().longitude;
+            if (markerLat > leftBottomLatlng.latitude && markerLat < rightTopLatlng.latitude
+                    && markerLng > leftBottomLatlng.longitude && markerLng < rightTopLatlng.longitude) {
+                needCameraMarkerItems.add(cameraMarkerItem);
+            }
+        }
+        rlSubscribeMsg.setVisibility(View.VISIBLE);
+        tvSubscribeMsg.setText("人脸抓拍机（" + allCameraMarkerItems.size() + "）");
+        MyLog.e(TAG, "开始聚合了 allCameraMarkerItems = " + allCameraMarkerItems.size() + ", needCameraMarkerItems = " + needCameraMarkerItems.size());
+        mClusterManager.clearItems();//清除所有的items
+        //        mClusterManager.getMarkerCollection().clear();
+        //        mClusterManager.getClusterMarkerCollection().clear();
+        mClusterManager.addItems(needCameraMarkerItems);
+        //算法计算聚合，并显示
+        mClusterManager.cluster();//类似于通知地图刷新聚合点marker
     }
 
     private void initMarkerBitmap() {
