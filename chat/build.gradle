@@ -6,15 +6,15 @@ if (isNeedChatModule.toBoolean()) {
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion rootProject.ext.android.compileSdkversions
+    buildToolsVersion rootProject.ext.android.buildToolsversions
 
     defaultConfig {
         if (isNeedChatModule.toBoolean()) {
             applicationId "com.example.chat"
         }
-        minSdkVersion 18
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.android.minSdkversions
+        targetSdkVersion rootProject.ext.android.targetSdkversions
         versionCode 1
         versionName "1.0"
 
@@ -35,6 +35,8 @@ android {
 
     sourceSets {
         main {
+            jniLibs.srcDirs = ['libs']
+
             if (isNeedChatModule.toBoolean()) {
                 manifest.srcFile 'src/main/debug/AndroidManifest.xml'
             } else {

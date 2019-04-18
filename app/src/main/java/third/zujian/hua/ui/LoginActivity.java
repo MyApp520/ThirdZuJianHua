@@ -1,4 +1,4 @@
-package second.zujian.hua.ui;
+package third.zujian.hua.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -41,7 +41,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import second.zujian.hua.R;
+import third.zujian.hua.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 

@@ -1,4 +1,4 @@
-package second.zujian.hua.ui;
+package third.zujian.hua.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -30,7 +30,7 @@ import butterknife.ButterKnife;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
-import second.zujian.hua.R;
+import third.zujian.hua.R;
 
 public class MainActivity extends BaseActivity implements HasSupportFragmentInjector {
 

@@ -1,13 +1,58 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.find.ui.FindMainFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.baidu.mapapi.map.TextureMapView
+        android:id="@+id/bd_mapview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/find_module_name" />
+        android:layout_height="match_parent">
+    </com.baidu.mapapi.map.TextureMapView>
 
-</FrameLayout>
+    <ImageView
+        android:id="@+id/image_screen_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/screen_center_marker"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_subscribe_msg"
+        android:layout_width="169dp"
+        android:layout_height="42dp"
+        android:layout_above="@+id/image_screen_center"
+        android:layout_centerInParent="true"
+        android:background="@drawable/map_subscribe_tips"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tv_subscribe_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8.5dp"
+            android:text="人脸抓拍机（0）"/>
+
+        <TextView
+            android:id="@+id/tv_subscribe_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@+id/tv_subscribe_msg"
+            android:text="订阅"
+            android:textColor="@color/backgroup"
+            android:textSize="18sp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_location"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="#f4f4f4"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/icon_dingwei"/>
+    </RelativeLayout>
+</RelativeLayout>

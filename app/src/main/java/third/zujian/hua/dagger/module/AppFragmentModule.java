@@ -1,4 +1,4 @@
-package second.zujian.hua.dagger.module;
+package third.zujian.hua.dagger.module;
 
 import com.example.chat.ui.ChatMainFragment;
 import com.example.commonlib.dagger.scope.FragmentScope;

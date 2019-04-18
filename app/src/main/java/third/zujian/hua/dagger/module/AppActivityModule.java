@@ -1,4 +1,4 @@
-package second.zujian.hua.dagger.module;
+package third.zujian.hua.dagger.module;
 
 import com.example.chat.dagger.module.ChatModuleAllActivityModule;
 import com.example.commonlib.dagger.scope.ActivityScope;
@@ -8,8 +8,8 @@ import com.example.mine.dagger.module.MineModuleAllActivityModule;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
-import second.zujian.hua.ui.MainActivity;
-import second.zujian.hua.ui.LoginActivity;
+import third.zujian.hua.ui.MainActivity;
+import third.zujian.hua.ui.LoginActivity;
 
 /**
  * Created by smile on 2019/3/20.

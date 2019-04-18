@@ -5,10 +5,10 @@ android {
     buildToolsVersion rootProject.ext.android.buildToolsversions
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 27
-        versionCode rootProject.ext.android.versionCode
-        versionName rootProject.ext.android.versionName
+        minSdkVersion rootProject.ext.android.minSdkversions
+        targetSdkVersion rootProject.ext.android.targetSdkversions
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -54,6 +54,12 @@ dependencies {
         exclude module: 'support-v4'
     }
     api rootProject.ext.dependencies["annotations"]
+
+    api(rootProject.ext.dependencies["rxpermissions2"]) {
+        exclude group: 'support-annotations'
+        exclude group: 'support-v7'
+        exclude group: 'support-v4'
+    }
 
     api(rootProject.ext.dependencies["butterknife"]) {
         exclude group: 'support-annotations'

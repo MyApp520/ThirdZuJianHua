@@ -1,1 +1,1 @@
-include ':app', ':chat', ':find', ':mine', ':group', ':commonlib'
+include ':app', ':chat', ':find', ':mine', ':group', ':commonlib', ':bdmaplibrary'

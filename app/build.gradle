@@ -2,15 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion rootProject.ext.android.compileSdkversions
+    buildToolsVersion rootProject.ext.android.buildToolsversions
 
     defaultConfig {
-        applicationId "second.zujian.hua"
-        minSdkVersion 18
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        applicationId "third.zujian.hua"
+        minSdkVersion rootProject.ext.android.minSdkversions
+        targetSdkVersion rootProject.ext.android.targetSdkversions
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -24,6 +24,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
 
@@ -46,6 +52,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation project(':commonlib')
+    implementation project(':bdmaplibrary')
+
     if(!isNeedChatModule.toBoolean()) {
         implementation project(':chat')
     }

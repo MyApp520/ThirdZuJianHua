@@ -5,9 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.alibaba.android.arouter.facade.Postcard;
@@ -27,7 +24,6 @@ import com.example.group.R2;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
@@ -42,41 +38,26 @@ public class GroupMainFragment extends BaseFragment {
     Unbinder unbinder;
 
     @Inject
+    Context context;
+    @Inject
     UserBean userBean;
 
     private final String TAG = getClass().getSimpleName();
-    private Context context;
 
-    public static GroupMainFragment newInstance() {
-        // Required empty public constructor
-        GroupMainFragment groupMainFragment = new GroupMainFragment();
-        return groupMainFragment;
+    @Override
+    protected int bindLayout() {
+        return R.layout.fragment_group_main;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
-    }
+    protected void initView() {
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_group_main, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.e(TAG, "GroupMainFragment onResume: userBean = " + userBean);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @OnClick(R2.id.tv_enter_chat_activity)
