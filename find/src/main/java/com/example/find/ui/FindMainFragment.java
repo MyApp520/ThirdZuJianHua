@@ -111,6 +111,7 @@ public class FindMainFragment extends BaseFragment {
     @Override
     protected void initView() {
         initMarkerBitmap();
+        initBDMapView();
     }
 
     @Override
@@ -148,6 +149,7 @@ public class FindMainFragment extends BaseFragment {
         if (mMapView == null) {
             return;
         }
+        mapZoomScale = BaiduMapManager.getInstance().initMapZoomScale();
         mBaiduMap = BaiduMapManager.getInstance().initBaiduMap(mMapView, mBaiDuMapLoadedCallback);
 
         // 设置地图监听，当地图状态发生改变时，进行点聚合运算
