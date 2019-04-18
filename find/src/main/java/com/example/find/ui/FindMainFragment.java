@@ -5,27 +5,35 @@ import android.content.Context;
 import android.graphics.Point;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.baidu.BaiduMapManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.BDLocationService;
+import com.baidu.mapapi.clusterutil.clustering.Cluster;
 import com.baidu.mapapi.clusterutil.clustering.ClusterItem;
 import com.baidu.mapapi.clusterutil.clustering.ClusterManager;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.utils.DistanceUtil;
 import com.example.commonlib.arouter.FindModuleArouterPath;
 import com.example.commonlib.base.BaseFragment;
 import com.example.commonlib.util.MyLog;
@@ -133,6 +141,115 @@ public class FindMainFragment extends BaseFragment {
     public void onStop() {
         super.onStop();
         MyLog.e(TAG, TAG + "---onStop() mMapView = " + mMapView);
+    }
+
+    private void initBDMapView() {
+        MyLog.e(TAG, TAG + "---initBDmapView() mMapView = " + mMapView);
+        if (mMapView == null) {
+            return;
+        }
+        mBaiduMap = BaiduMapManager.getInstance().initBaiduMap(mMapView, mBaiDuMapLoadedCallback);
+
+        // 设置地图监听，当地图状态发生改变时，进行点聚合运算
+        // ClusterManager类已经实现了BaiduMap.OnMapStatusChangeListener, BaiduMap.OnMarkerClickListener两个接口
+        initClusterManager();//初始化聚合点功能
+
+        mBaiduMap.setOnMapStatusChangeListener(mClusterManager);
+        // 设置maker点击时的响应
+        mBaiduMap.setOnMarkerClickListener(mClusterManager);
+
+        // 初始化地理/逆地理编码模块，注册事件监听
+        mGeoCoder = GeoCoder.newInstance();
+        mGeoCoder.setOnGetGeoCodeResultListener(mBaiDuMapOnGetGeoCoderResultListener);
+    }
+
+    /**
+     * 初始化聚合点功能
+     */
+    private void initClusterManager() {
+        // 定义点聚合管理类ClusterManager
+        mClusterManager = new ClusterManager<>(mContext, mBaiduMap);
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<BaiDuMapMarkerItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<BaiDuMapMarkerItem> cluster) {
+                Toast.makeText(mContext, "有" + cluster.getSize() + "个点", Toast.LENGTH_SHORT).show();
+                MyLog.e(TAG, TAG + "---onClusterClick 发生了");
+                return false;
+            }
+        });
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<BaiDuMapMarkerItem>() {
+            @Override
+            public boolean onClusterItemClick(BaiDuMapMarkerItem item) {
+
+                return false;
+            }
+        });
+        mClusterManager.setMapStatusChangeFinishListener(new ClusterManager.OnMapStatusChangeListener() {
+            @Override
+            public void onClusterFindMapStatusChangeStart(MapStatus mapStatus) {
+                bdmapHasChange = true;
+                if (rlSubscribeMsg.getVisibility() == View.VISIBLE) {
+                    rlSubscribeMsg.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onClusterFindMapStatusChangeFinish(MapStatus mapStatus) {
+                if (mapStatus == null || mMapView == null || mBaiduMap == null) {
+                    bdmapHasChange = false;
+                    return;
+                }
+                mapCurrentZoom = mapStatus.zoom;
+                leftBottomLatlng = mapStatus.bound.southwest;
+                rightTopLatlng = mapStatus.bound.northeast;
+
+                MyLog.e(TAG, "地图状态变化结束 MapStatus=" + mapStatus.toString());
+                MyLog.e(TAG, "地图状态变化结束 rightTopLatlng = " + rightTopLatlng + ", leftBottomLatlng = " + leftBottomLatlng);
+                //target为地图操作的中心点经纬度坐标
+                BaiduMapManager.getInstance().reGeoCode(mGeoCoder, mapStatus.target.latitude, mapStatus.target.longitude);
+                startJumpAnimation();
+                rlSubscribeMsg.setVisibility(View.VISIBLE);
+
+                double mapMoveDistance = 0;
+                double temp_longitude = mapStatus.target.longitude;
+                double temp_latitude = mapStatus.target.latitude;
+                if (temp_longitude > 108 && temp_latitude > 20 && screenCenterLongitude > 108 && screenCenterLatitude > 20) {
+                    mapMoveDistance = DistanceUtil.getDistance(new LatLng(temp_latitude, temp_longitude), new LatLng(screenCenterLatitude, screenCenterLongitude));
+                }
+
+                screenCenterLongitude = temp_longitude;
+                screenCenterLatitude = temp_latitude;
+                int tempZoomInteger = Math.round((float) Math.floor(mapCurrentZoom)); //取整
+                int mapCurrentScale = mapZoomScale.get(tempZoomInteger);
+                double mustMoveDistance = mapCurrentZoom / tempZoomInteger * mapCurrentScale;
+                if (tempZoomInteger > 18) {
+                    mustMoveDistance = mustMoveDistance * 2;
+                }
+
+                MyLog.e(TAG, "地图移动距离 mapMoveDistance = " + mapMoveDistance + ", mustMoveDistance = " + mustMoveDistance
+                        + "\n tempZoomInteger = " + tempZoomInteger + ", mapCurrentScale = " + mapCurrentScale);
+            }
+        });
+    }
+
+    /**
+     * 屏幕中心marker(ImageView) 跳动
+     */
+    private void startJumpAnimation() {
+        if (imageScreenCenter != null) {
+            MyLog.e(TAG, TAG + "---来个动画");
+            Animation animation = new TranslateAnimation(0, 0, -UIUtils.dp2px(mContext, 68), 0);
+            //越来越快
+            animation.setInterpolator(new AccelerateInterpolator());
+            //整个移动所需要的时间
+            animation.setDuration(200);
+            //设置动画
+            imageScreenCenter.setAnimation(animation);
+            //开始动画
+            imageScreenCenter.startAnimation(animation);
+        } else {
+            Log.e(TAG, TAG + " imageScreenCenter is null");
+        }
     }
 
     /**
