@@ -18,6 +18,7 @@ import com.example.commonlib.arouter.GroupModuleArouterPath;
 import com.example.commonlib.base.BaseFragment;
 import com.example.commonlib.bean.UserBean;
 import com.example.commonlib.constants.ConfigConstants;
+import com.example.commonlib.util.MyLog;
 import com.example.group.R;
 import com.example.group.R2;
 
@@ -55,9 +56,42 @@ public class GroupMainFragment extends BaseFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        MyLog.e(TAG, TAG + "---onStart()");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        Log.e(TAG, "GroupMainFragment onResume: userBean = " + userBean);
+        currentFragmentIsVisible = getUserVisibleHint();
+        MyLog.e(TAG, TAG + "---onResume() isHidden() = " + isHidden() + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MyLog.e(TAG, TAG + "---onPause()");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        MyLog.e(TAG, TAG + "---onStop()");
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        currentFragmentIsVisible = getUserVisibleHint();
+        MyLog.e(TAG, TAG + "---setUserVisibleHint() isVisibleToUser = " + isVisibleToUser + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        currentFragmentIsVisible = getUserVisibleHint();
+        MyLog.e(TAG, TAG + "---onHiddenChanged() hidden = " + hidden + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
     }
 
     @OnClick(R2.id.tv_enter_chat_activity)

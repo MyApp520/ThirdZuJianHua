@@ -138,19 +138,9 @@ public class FindMainFragment extends BaseFragment {
             mMapView.onResume();
         }
         super.onResume();
-        MyLog.e(TAG, TAG + "---onResume() mMapView = " + mMapView);
-
-        if (mBDLocationService == null) {
-            //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
-            mBDLocationService = BaiduMapManager.getInstance().getBDLocationService();
-            mBDLocationService.registerListener(mBaiDuMapLocationListener);
-            mBDLocationService.setLocationOption(mBDLocationService.getDefaultLocationClientOption());
-        }
-        if (AndroidLocationUtils.checkGPSIsOpen(mContext)) {
-            startBaiDuMapLocation();
-        } else {
-            tipsAlertDialog = AndroidLocationUtils.openGPSSettings(mActivity, tipsAlertDialog, GPS_REQUEST_CODE);
-        }
+        currentFragmentIsVisible = getUserVisibleHint();
+        MyLog.e(TAG, TAG + "---onResume() mMapView = " + mMapView
+                + ", isHidden() = " + isHidden() + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
     }
 
     @Override
@@ -166,6 +156,48 @@ public class FindMainFragment extends BaseFragment {
     public void onStop() {
         super.onStop();
         MyLog.e(TAG, TAG + "---onStop() mMapView = " + mMapView);
+    }
+
+    /**
+     * 适用于ViewPager中嵌套Fragment的场景，在PagerAdapter中左右滑动时通过设置当前显示的Fragment会触发该方法，能得出正确的判断
+     * @param isVisibleToUser
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        currentFragmentIsVisible = getUserVisibleHint();
+        MyLog.e(TAG, TAG + "---setUserVisibleHint() isVisibleToUser = " + isVisibleToUser + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
+        checkGPSIsOpen(isVisibleToUser);
+    }
+
+    /**
+     * 适用于通过FragmentManager添加多个Fragment并且在点击切换Fragment的场景，通过FragmentManager的hide和show方法触发，能得出正确的判断
+     * @param hidden
+     */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        currentFragmentIsVisible = getUserVisibleHint();
+        MyLog.e(TAG, TAG + "---onHiddenChanged() hidden = " + hidden + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
+        checkGPSIsOpen(!hidden);
+    }
+
+    /**
+     * @param isVisibleToUser 界面是否可见  true可见  false不可见
+     */
+    private void checkGPSIsOpen(boolean isVisibleToUser) {
+        if (isVisibleToUser) {
+            if (mBDLocationService == null) {
+                //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+                mBDLocationService = BaiduMapManager.getInstance().getBDLocationService();
+                mBDLocationService.registerListener(mBaiDuMapLocationListener);
+            }
+            if (AndroidLocationUtils.checkGPSIsOpen(mContext)) {
+                startBaiDuMapLocation();
+            } else {
+                tipsAlertDialog = AndroidLocationUtils.openGPSSettings(mActivity, tipsAlertDialog, GPS_REQUEST_CODE);
+            }
+        }
     }
 
     private void initBDMapView() {

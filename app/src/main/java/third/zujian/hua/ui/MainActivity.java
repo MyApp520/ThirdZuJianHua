@@ -94,6 +94,7 @@ public class MainActivity extends BaseActivity implements HasSupportFragmentInje
         list.add(ArouterActionManager.getInstance().getFragmentInstance(MineModuleArouterPath.MINE_MAIN_FRAGMENT));
         viewPagerAdapter.setList(list);
         viewPager.setAdapter(viewPagerAdapter);
+        viewPager.setOffscreenPageLimit(3);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -103,16 +104,16 @@ public class MainActivity extends BaseActivity implements HasSupportFragmentInje
             menuItem = item;
             switch (item.getItemId()) {
                 case R.id.chat:
-                    viewPager.setCurrentItem(0);
+                    viewPager.setCurrentItem(0, false);//第二个参数表示是否跳转到指定这个界面时，是直接跳转还是一个一个页面滑动过去
                     return true;
                 case R.id.group:
-                    viewPager.setCurrentItem(1);
+                    viewPager.setCurrentItem(1, false);
                     return true;
                 case R.id.find:
-                    viewPager.setCurrentItem(2);
+                    viewPager.setCurrentItem(2, false);
                     return true;
                 case R.id.mine:
-                    viewPager.setCurrentItem(3);
+                    viewPager.setCurrentItem(3, false);
                     return true;
             }
             return false;

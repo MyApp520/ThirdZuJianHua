@@ -26,6 +26,10 @@ public abstract class BaseFragment extends Fragment {
      * fragment显示状态标记
      */
     private final String STATE_SAVE_IS_HIDDEN = "STATE_SAVE_IS_HIDDEN";
+    /**
+     * 当前fragment是否可见
+     */
+    protected boolean currentFragmentIsVisible;
     private Unbinder unbinder;
 
     protected abstract int bindLayout();
