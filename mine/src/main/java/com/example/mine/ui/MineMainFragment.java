@@ -2,12 +2,12 @@ package com.example.mine.ui;
 
 
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.example.commonlib.arouter.MineModuleArouterPath;
 import com.example.commonlib.base.BaseFragment;
 import com.example.commonlib.bean.UserBean;
+import com.example.commonlib.util.MyLog;
 import com.example.mine.R;
 
 import javax.inject.Inject;
@@ -35,8 +35,19 @@ public class MineMainFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Log.e(TAG, "MineMainFragment onResume: userBean = " + userBean);
+    protected void onLazyInitEvent() {
+
+    }
+
+    @Override
+    public void onSupportVisible() {
+        super.onSupportVisible();
+        MyLog.e(TAG, TAG + "---onSupportVisible()  我的界面可见了");
+    }
+
+    @Override
+    public void onSupportInvisible() {
+        super.onSupportInvisible();
+        MyLog.e(TAG, TAG + "---onSupportInvisible() 我的界面不可见");
     }
 }

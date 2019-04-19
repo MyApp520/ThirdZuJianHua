@@ -56,7 +56,16 @@ dependencies {
     api rootProject.ext.dependencies["annotations"]
 
     //引入fragmentation框架
-    api 'me.yokeyword:fragmentation-core:1.3.6'
+    api(rootProject.ext.dependencies["fragmentation"]) {
+        exclude group: 'support-annotations'
+        exclude group: 'support-v7'
+        exclude group: 'support-v4'
+    }
+    api(rootProject.ext.dependencies["fragmentation-core"]) {
+        exclude group: 'support-annotations'
+        exclude group: 'support-v7'
+        exclude group: 'support-v4'
+    }
 
     api(rootProject.ext.dependencies["rxpermissions2"]) {
         exclude group: 'support-annotations'

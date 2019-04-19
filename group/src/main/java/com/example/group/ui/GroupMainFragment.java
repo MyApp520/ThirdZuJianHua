@@ -56,42 +56,20 @@ public class GroupMainFragment extends BaseFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        MyLog.e(TAG, TAG + "---onStart()");
+    protected void onLazyInitEvent() {
+
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        currentFragmentIsVisible = getUserVisibleHint();
-        MyLog.e(TAG, TAG + "---onResume() isHidden() = " + isHidden() + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
+    public void onSupportVisible() {
+        super.onSupportVisible();
+        MyLog.e(TAG, TAG + "---onSupportVisible()  group界面可见了");
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        MyLog.e(TAG, TAG + "---onPause()");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        MyLog.e(TAG, TAG + "---onStop()");
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        currentFragmentIsVisible = getUserVisibleHint();
-        MyLog.e(TAG, TAG + "---setUserVisibleHint() isVisibleToUser = " + isVisibleToUser + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        currentFragmentIsVisible = getUserVisibleHint();
-        MyLog.e(TAG, TAG + "---onHiddenChanged() hidden = " + hidden + ", currentFragmentIsVisible = " + currentFragmentIsVisible);
+    public void onSupportInvisible() {
+        super.onSupportInvisible();
+        MyLog.e(TAG, TAG + "---onSupportInvisible() group界面不可见");
     }
 
     @OnClick(R2.id.tv_enter_chat_activity)

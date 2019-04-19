@@ -30,6 +30,10 @@ ext {
             "annotations"                  : "com.android.support:support-annotations:${versions["androidSupportSdkversions"]}",
             "recyclerview-v7"              : "com.android.support:recyclerview-v7:${versions["androidSupportSdkversions"]}",
 
+            //fragmentation框架
+            "fragmentation"                : "me.yokeyword:fragmentation:1.3.6",
+            "fragmentation-core"           : "me.yokeyword:fragmentation-core:1.3.6",
+
             //network
             "retrofit"                     : "com.squareup.retrofit2:retrofit:${versions["retrofitSdkversions"]}",
             "retrofit-converter-gson"      : "com.squareup.retrofit2:converter-gson:${versions["retrofitSdkversions"]}",
