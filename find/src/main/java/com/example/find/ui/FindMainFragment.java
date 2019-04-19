@@ -30,6 +30,7 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
@@ -334,6 +335,32 @@ public class FindMainFragment extends BaseFragment {
     }
 
     /**
+     * 根据定位后的坐标---地图显示到指定坐标位置
+     *
+     * @param location
+     */
+    private void jumpToMapSpecifiedLocation(BDLocation location) {
+        if (location == null) {
+            return;
+        }
+        MyLog.e(TAG, TAG + "--- showLocationMap() 显示当前定位到的位置  " + location.getLatitude() + "---" + location.getLongitude());
+        /**
+         * 1、MyLocationData 定位数据类，地图上的定位位置需要经纬度、精度、方向这几个参数，所以这里我们把这个几个参数传给地图
+         * 2、如果不需要要精度圈，推荐builder.accuracy(0);否则：accuracy(location.getRadius())
+         * 3、direction(mCurrentDirection) mCurrentDirection 是通过手机方向传感器获取的方向；
+         *     也可以先设置option.setNeedDeviceDirect(true)，然后使用direction(location.getDirection())
+         *     但是这不会时时更新位置的方向，因为周期性请求定位有时间间隔。
+         * location.getLatitude()和location.getLongitude()经纬度，如果你只需要在地图上显示某个固定的位置，完全可以写入固定的值，
+         * 如纬度36.958454，经度114.137588，这样就不要要同过定位sdk来获取位置了
+         */
+        MyLocationData mLocationData = new MyLocationData.Builder().accuracy(0)
+                .direction(location.getDirection()).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
+
+        mBaiduMap.setMyLocationData(mLocationData);//给地图设置定位数据，这样地图就显示到当前位置了
+        BaiduMapManager.getInstance().goToTargetLocation(mBaiduMap, locationLatlng, 18.0f);
+    }
+
+    /**
      * 重新添加聚合点marker
      */
     private void reloadClusterMarker() {
@@ -443,7 +470,7 @@ public class FindMainFragment extends BaseFragment {
                 }
 
                 MyLog.e(TAG, TAG + "---location.getLatitude() = " + location.getLatitude() + "  location.getLongitude() = " + location.getLongitude());
-//                jumpToMapSpecifiedLocation(location);
+                jumpToMapSpecifiedLocation(location);
                 ShowToast.showToast(mContext, "地图定位成功 locType = " + location.getLocType());
             } else {
                 ShowToast.showToast(mContext, "地图定位失败，请检查网络：locType = " + location.getLocType());
