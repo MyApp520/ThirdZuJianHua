@@ -59,7 +59,7 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="MdG046p6gOjKBFlAcjIcgFk8yDelwhiU" />
+            android:value="DU5hGw5Eu1RIS2N18lneIwWx9WiO63ia" />
 
         <activity android:name="third.zujian.hua.ui.MainActivity">
             <intent-filter>

@@ -1,9 +1,12 @@
 package com.example.find.ui;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +39,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.example.commonlib.arouter.FindModuleArouterPath;
 import com.example.commonlib.base.BaseFragment;
+import com.example.commonlib.util.AndroidLocationUtils;
 import com.example.commonlib.util.MyLog;
 import com.example.commonlib.util.ShowToast;
 import com.example.commonlib.util.UIUtils;
@@ -74,6 +78,8 @@ public class FindMainFragment extends BaseFragment {
     Context mContext;
 
     private final String TAG = getClass().getSimpleName();
+    private final int GPS_REQUEST_CODE = 0x02;
+    private Activity mActivity;
     private BaiduMap mBaiduMap;
     private BDLocationService mBDLocationService;
     private String locationAddress = "";
@@ -101,7 +107,13 @@ public class FindMainFragment extends BaseFragment {
      * 百度地图聚合点管理类
      */
     private ClusterManager<BaiDuMapMarkerItem> mClusterManager;
+    private AlertDialog tipsAlertDialog;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.mActivity = (Activity) context;
+    }
 
     @Override
     protected int bindLayout() {
@@ -127,6 +139,18 @@ public class FindMainFragment extends BaseFragment {
         }
         super.onResume();
         MyLog.e(TAG, TAG + "---onResume() mMapView = " + mMapView);
+
+        if (mBDLocationService == null) {
+            //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+            mBDLocationService = BaiduMapManager.getInstance().getBDLocationService();
+            mBDLocationService.registerListener(mBaiDuMapLocationListener);
+            mBDLocationService.setLocationOption(mBDLocationService.getDefaultLocationClientOption());
+        }
+        if (AndroidLocationUtils.checkGPSIsOpen(mContext)) {
+            startBaiDuMapLocation();
+        } else {
+            tipsAlertDialog = AndroidLocationUtils.openGPSSettings(mActivity, tipsAlertDialog, GPS_REQUEST_CODE);
+        }
     }
 
     @Override
@@ -321,7 +345,17 @@ public class FindMainFragment extends BaseFragment {
         } else if (R.id.rl_subscribe_msg == view.getId()) {
 
         } else if (R.id.rl_location == view.getId()) {
+            startBaiDuMapLocation();
+        }
+    }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //  super.onActivityResult(requestCode, resultCode, data);
+        MyLog.e(TAG, TAG + "---resultCode=" + resultCode);
+        switch (requestCode) {
+            case GPS_REQUEST_CODE:
+                break;
         }
     }
 
@@ -444,6 +478,30 @@ public class FindMainFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
+        MyLog.e(TAG, TAG + "---onDestroyView() mMapView = " + mMapView);
+        if (mBDLocationService != null) {
+            mBDLocationService.unregisterListener(mBaiDuMapLocationListener);
+            stopBaiDuMapLocation();
+        }
+        imageScreenCenter.clearAnimation();
+        if (mBaiduMap != null) {
+            mBaiduMap.clear();
+            // 关闭定位图层
+            mBaiduMap.setMyLocationEnabled(false);
+        }
+
+        dismissXhProgressDialog(tipsAlertDialog);
+        recycleBitmap();
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        MyLog.e(TAG, TAG + "---onDestroy()  mMapView = " + mMapView);
+        if (mMapView != null) {
+            mMapView.onDestroy();
+            mMapView = null;
+        }
+        super.onDestroy();
     }
 }
