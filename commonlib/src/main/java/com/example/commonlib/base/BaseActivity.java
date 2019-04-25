@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import com.example.commonlib.util.ShowToast;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import dagger.android.AndroidInjection;
 import io.reactivex.functions.Consumer;
 import me.yokeyword.fragmentation.ExtraTransaction;
@@ -23,7 +25,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
  * Created by smile on 2019/3/20.
  */
 
-public class BaseActivity extends FragmentActivity implements ISupportActivity {
+public abstract class BaseActivity extends FragmentActivity implements ISupportActivity {
 
     private String[] permissionArray = new String[] {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -33,6 +35,7 @@ public class BaseActivity extends FragmentActivity implements ISupportActivity {
             Manifest.permission.READ_PHONE_STATE
     };
     final SupportActivityDelegate mDelegate = new SupportActivityDelegate(this);
+    private Unbinder unbinder;
 
     @Override
     public SupportActivityDelegate getSupportDelegate() {
@@ -54,8 +57,14 @@ public class BaseActivity extends FragmentActivity implements ISupportActivity {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         mDelegate.onCreate(savedInstanceState);
+        setContentView(bindLayout());
+        unbinder = ButterKnife.bind(this);
         initCheckPermission();
+        initView();
     }
+
+    protected abstract int bindLayout();
+    protected abstract void initView();
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
@@ -222,5 +231,8 @@ public class BaseActivity extends FragmentActivity implements ISupportActivity {
     protected void onDestroy() {
         mDelegate.onDestroy();
         super.onDestroy();
+        if (unbinder != null) {
+            unbinder.unbind();
+        }
     }
 }

@@ -35,7 +35,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/><!--唤醒屏幕权限-->
 
     <application>
-        <activity android:name=".ui.FindMainActivity"></activity>
+        <activity android:name=".ui.activity.PoliceWalkTrackActivity" />
     </application>
 
 </manifest>

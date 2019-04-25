@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -30,7 +31,6 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
-import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
@@ -41,15 +41,18 @@ import com.baidu.mapapi.utils.DistanceUtil;
 import com.example.commonlib.arouter.FindModuleArouterPath;
 import com.example.commonlib.base.BaseFragment;
 import com.example.commonlib.util.AndroidLocationUtils;
+import com.example.commonlib.util.AppDebugUtil;
 import com.example.commonlib.util.MyLog;
 import com.example.commonlib.util.ShowToast;
 import com.example.commonlib.util.UIUtils;
 import com.example.find.R;
 import com.example.find.R2;
+import com.example.find.ui.activity.PoliceWalkTrackActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -63,7 +66,7 @@ import butterknife.OnClick;
 public class FindMainFragment extends BaseFragment {
 
     @BindView(R2.id.bd_mapview)
-    TextureMapView mMapView;
+    TextureMapView mTextureMapView;
     @BindView(R2.id.image_screen_center)
     ImageView imageScreenCenter;
     @BindView(R2.id.tv_subscribe_msg)
@@ -87,7 +90,7 @@ public class FindMainFragment extends BaseFragment {
     private LatLng locationLatlng;//保存定位接口回调结果的经纬度，用于添加一个固定不变的标记(marker)
     private double screenCenterLongitude, screenCenterLatitude;//屏幕中心点经纬度
 
-    private BitmapDescriptor bitmapDescScreenCenter, bitmapDescLocation, bitmapDescJuheMarker;
+    private BitmapDescriptor bitmapDescScreenCenter, bitmapDescLocation, bitmapRedAlarmMarker, bitmapPolicemenMarker, bitmapCameraMarker;
     private GeoCoder mGeoCoder;
     private boolean bdmapHasChange;//地图状态是否发生了变化
 
@@ -97,8 +100,8 @@ public class FindMainFragment extends BaseFragment {
     private LatLng rightTopLatlng, leftBottomLatlng;
     private HashMap<Integer, Integer> mapZoomScale = new HashMap<>();// 地图缩放层级比例尺对应的距离
 
-    private List<BaiDuMapMarkerItem> allCameraMarkerItems = new ArrayList<>();
-    private List<BaiDuMapMarkerItem> needCameraMarkerItems = new ArrayList<>();
+    private List<BaiDuMapMarkerItem> allMarkerItems = new ArrayList<>();
+    private List<BaiDuMapMarkerItem> needMarkerItems = new ArrayList<>();
 
     /**
      * 发起百度地图定位的时间
@@ -130,33 +133,33 @@ public class FindMainFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        MyLog.e(TAG, TAG + "---onStart() mMapView = " + mMapView);
+        MyLog.e(TAG, TAG + "---onStart() mTextureMapView = " + mTextureMapView);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        MyLog.e(TAG, TAG + "---onResume() mMapView = " + mMapView);
+        MyLog.e(TAG, TAG + "---onResume() mTextureMapView = " + mTextureMapView);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        MyLog.e(TAG, TAG + "---onPause()  mMapView = " + mMapView);
+        MyLog.e(TAG, TAG + "---onPause()  mTextureMapView = " + mTextureMapView);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        MyLog.e(TAG, TAG + "---onStop() mMapView = " + mMapView);
+        MyLog.e(TAG, TAG + "---onStop() mTextureMapView = " + mTextureMapView);
     }
 
     @Override
     public void onSupportVisible() {
         super.onSupportVisible();
-        MyLog.e(TAG, TAG + "---onSupportVisible()地图界面可见了 mMapView = " + mMapView);
-        if (mMapView != null) {
-            mMapView.onResume();
+        MyLog.e(TAG, TAG + "---onSupportVisible()地图界面可见了 mTextureMapView = " + mTextureMapView);
+        if (mTextureMapView != null) {
+            mTextureMapView.onResume();
         }
         if (mBDLocationService == null) {
             //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
@@ -173,24 +176,69 @@ public class FindMainFragment extends BaseFragment {
     @Override
     public void onSupportInvisible() {
         super.onSupportInvisible();
-        MyLog.e(TAG, TAG + "---onSupportInvisible()地图界面不可见 mMapView = " + mMapView);
-        if (mMapView != null) {
-            mMapView.onPause();
+        MyLog.e(TAG, TAG + "---onSupportInvisible()地图界面不可见 mTextureMapView = " + mTextureMapView);
+        if (mTextureMapView != null) {
+            mTextureMapView.onPause();
         }
     }
 
     @Override
     protected void onLazyInitEvent() {
+    }
 
+    private void testMarker() {
+        allMarkerItems.clear();
+        BaiDuMapMarkerItem baiDuMapMarkerItem;
+        for (int i = 0; i < 360; i++) {
+            LatLng latLng;
+            if (i < 20) {
+                latLng = new LatLng(22.587589000555752 + (0.000333 * i), 114.12248499999997 + (0.000333 * i));
+            } else if (i < 40) {
+                latLng = new LatLng(22.587589000555752 + (0.000123 * i), 114.12248499999997 + (0.000107 * i));
+            } else if (i < 60) {
+                latLng = new LatLng(22.581589000555752 + (0.000103 * i), 114.12548499999997 + (0.000083 * i));
+            } else if (i < 80) {
+                latLng = new LatLng(22.583589000555752 + (0.000053 * i), 114.12548499999997 + (0.000123 * i));
+            } else if (i < 100) {
+                latLng = new LatLng(22.585289000555752 + (0.000123 * i), 114.12348499999997 + (0.000107 * i));
+            } else if (i < 140) {
+                latLng = new LatLng(22.586189000555752 + (0.000103 * i), 114.12248499999997 + (0.000083 * i));
+            } else if (i < 180) {
+                latLng = new LatLng(22.586589000555752 + (0.000053 * i), 114.12248499999997 + (0.000123 * i));
+            }  else if (i < 220) {
+                latLng = new LatLng(22.585589000555752 + (0.000123 * i), 114.12248499999997 + (0.000107 * i));
+            } else if (i < 260) {
+                latLng = new LatLng(22.584589000555752 + (0.000103 * i), 114.12248499999997 + (0.000083 * i));
+            } else if (i < 300) {
+                latLng = new LatLng(22.583589000555752 + (0.000053 * i), 114.12248499999997 + (0.000123 * i));
+            }  else {
+                latLng = new LatLng(22.582589000555752 + (0.000009 * i), 114.12248499999997 + (0.000073 * i));
+            }
+            baiDuMapMarkerItem = new BaiDuMapMarkerItem(latLng);
+            if (i % 3 == 0) {
+                baiDuMapMarkerItem.setMarkerType(baiDuMapMarkerItem.CAMERA_MARKER);
+            } else if (i % 2 == 0) {
+                baiDuMapMarkerItem.setMarkerType(baiDuMapMarkerItem.POLICEMEN_MARKER);
+                baiDuMapMarkerItem.setName("民警 " + i + " 号");
+                baiDuMapMarkerItem.setNum("602680" + i * 6);
+            } else {
+                baiDuMapMarkerItem.setMarkerType(baiDuMapMarkerItem.RED_ALARM_MARKER);
+                baiDuMapMarkerItem.setName("警情 " + i + " 号");
+                baiDuMapMarkerItem.setNum("999" + i * 6);
+            }
+            allMarkerItems.add(baiDuMapMarkerItem);
+        }
+        reloadClusterMarker(-1);
     }
 
     private void initBDMapView() {
-        MyLog.e(TAG, TAG + "---initBDmapView() mMapView = " + mMapView);
-        if (mMapView == null) {
+        MyLog.e(TAG, TAG + "---initBDmapView() mTextureMapView = " + mTextureMapView);
+        if (mTextureMapView == null) {
             return;
         }
+        isFirstFinishMapChange = true;
         mapZoomScale = BaiduMapManager.getInstance().initMapZoomScale();
-        mBaiduMap = BaiduMapManager.getInstance().initBaiduMap(mMapView, mBaiDuMapLoadedCallback);
+        mBaiduMap = BaiduMapManager.getInstance().initBaiduTextureMapView(mTextureMapView, mBaiDuMapLoadedCallback);
 
         // 设置地图监听，当地图状态发生改变时，进行点聚合运算
         // ClusterManager类已经实现了BaiduMap.OnMapStatusChangeListener, BaiduMap.OnMarkerClickListener两个接口
@@ -237,7 +285,7 @@ public class FindMainFragment extends BaseFragment {
 
             @Override
             public void onClusterFindMapStatusChangeFinish(MapStatus mapStatus) {
-                if (mapStatus == null || mMapView == null || mBaiduMap == null) {
+                if (mapStatus == null || mTextureMapView == null || mBaiduMap == null) {
                     bdmapHasChange = false;
                     return;
                 }
@@ -270,6 +318,12 @@ public class FindMainFragment extends BaseFragment {
 
                 MyLog.e(TAG, "地图移动距离 mapMoveDistance = " + mapMoveDistance + ", mustMoveDistance = " + mustMoveDistance
                         + "\n tempZoomInteger = " + tempZoomInteger + ", mapCurrentScale = " + mapCurrentScale);
+                if (isFirstFinishMapChange) {
+                    isFirstFinishMapChange = false;
+                }
+                if (AppDebugUtil.isDebug()) {
+                    testMarker();//测试用例，正式发版时去掉，调试使用
+                }
             }
         });
     }
@@ -318,51 +372,36 @@ public class FindMainFragment extends BaseFragment {
     }
 
     /**
-     * 根据定位后的坐标---地图显示到指定坐标位置
-     *
-     * @param location
-     */
-    private void jumpToMapSpecifiedLocation(BDLocation location) {
-        if (location == null) {
-            return;
-        }
-        MyLog.e(TAG, TAG + "--- showLocationMap() 显示当前定位到的位置  " + location.getLatitude() + "---" + location.getLongitude());
-        /**
-         * 1、MyLocationData 定位数据类，地图上的定位位置需要经纬度、精度、方向这几个参数，所以这里我们把这个几个参数传给地图
-         * 2、如果不需要要精度圈，推荐builder.accuracy(0);否则：accuracy(location.getRadius())
-         * 3、direction(mCurrentDirection) mCurrentDirection 是通过手机方向传感器获取的方向；
-         *     也可以先设置option.setNeedDeviceDirect(true)，然后使用direction(location.getDirection())
-         *     但是这不会时时更新位置的方向，因为周期性请求定位有时间间隔。
-         * location.getLatitude()和location.getLongitude()经纬度，如果你只需要在地图上显示某个固定的位置，完全可以写入固定的值，
-         * 如纬度36.958454，经度114.137588，这样就不要要同过定位sdk来获取位置了
-         */
-        MyLocationData mLocationData = new MyLocationData.Builder().accuracy(0)
-                .direction(location.getDirection()).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
-
-        mBaiduMap.setMyLocationData(mLocationData);//给地图设置定位数据，这样地图就显示到当前位置了
-        BaiduMapManager.getInstance().goToTargetLocation(mBaiduMap, locationLatlng, 18.0f);
-    }
-
-    /**
      * 重新添加聚合点marker
+     *
+     * @param markerType 图片需要显示的是哪种类型的marker  -1：显示全部的   0：镜头    1：警情    2：警员
      */
-    private void reloadClusterMarker() {
-        needCameraMarkerItems.clear();
-        for (BaiDuMapMarkerItem cameraMarkerItem : allCameraMarkerItems) {
-            double markerLat = cameraMarkerItem.getPosition().latitude;
-            double markerLng = cameraMarkerItem.getPosition().longitude;
+    private void reloadClusterMarker(int markerType) {
+        needMarkerItems.clear();
+        for (BaiDuMapMarkerItem markerItem : allMarkerItems) {
+            double markerLat = markerItem.getPosition().latitude;
+            double markerLng = markerItem.getPosition().longitude;
             if (markerLat > leftBottomLatlng.latitude && markerLat < rightTopLatlng.latitude
                     && markerLng > leftBottomLatlng.longitude && markerLng < rightTopLatlng.longitude) {
-                needCameraMarkerItems.add(cameraMarkerItem);
+                switch (markerType) {
+                    case -1:
+                        needMarkerItems.add(markerItem);
+                        break;
+                    default:
+                        if (markerType == markerItem.getMarkerType()) {
+                            needMarkerItems.add(markerItem);
+                        }
+                        break;
+                }
             }
         }
         rlSubscribeMsg.setVisibility(View.VISIBLE);
-        tvSubscribeMsg.setText("人脸抓拍机（" + allCameraMarkerItems.size() + "）");
-        MyLog.e(TAG, "开始聚合了 allCameraMarkerItems = " + allCameraMarkerItems.size() + ", needCameraMarkerItems = " + needCameraMarkerItems.size());
+        tvSubscribeMsg.setText("聚合点（" + needMarkerItems.size() + "）");
+        MyLog.e(TAG, "开始聚合了 allMarkerItems = " + allMarkerItems.size() + ", needMarkerItems = " + needMarkerItems.size());
         mClusterManager.clearItems();//清除所有的items
         //        mClusterManager.getMarkerCollection().clear();
         //        mClusterManager.getClusterMarkerCollection().clear();
-        mClusterManager.addItems(needCameraMarkerItems);
+        mClusterManager.addItems(needMarkerItems);
         //算法计算聚合，并显示
         mClusterManager.cluster();//类似于通知地图刷新聚合点marker
     }
@@ -371,23 +410,28 @@ public class FindMainFragment extends BaseFragment {
         // 初始化全局 bitmap 信息，不用时及时 recycle
         bitmapDescScreenCenter = BitmapDescriptorFactory.fromResource(R.drawable.screen_center_marker);
         bitmapDescLocation = BitmapDescriptorFactory.fromResource(R.drawable.location_marker);
-        bitmapDescJuheMarker = BitmapDescriptorFactory.fromResource(R.drawable.location_marker);
+        bitmapRedAlarmMarker = BitmapDescriptorFactory.fromResource(R.drawable.red_alarm_marker);
+        bitmapPolicemenMarker = BitmapDescriptorFactory.fromView(LayoutInflater.from(mContext).inflate(R.layout.view_map_marker_policemen, null));
+        bitmapCameraMarker = BitmapDescriptorFactory.fromResource(R.drawable.image_camera);
     }
 
     private void recycleBitmap() {
         bitmapDescLocation.recycle();
         bitmapDescScreenCenter.recycle();
-        bitmapDescJuheMarker.recycle();
+        bitmapRedAlarmMarker.recycle();
+        bitmapPolicemenMarker.recycle();
+        bitmapCameraMarker.recycle();
     }
 
-    @OnClick({R2.id.image_screen_center, R2.id.rl_subscribe_msg, R2.id.rl_location})
+    @OnClick({R2.id.tv_subscribe_msg, R2.id.rl_location, R2.id.tv_subscribe_camera})
     public void onViewClicked(View view) {
-        if (R.id.image_screen_center == view.getId()) {
-
-        } else if (R.id.rl_subscribe_msg == view.getId()) {
-
+        if (R.id.tv_subscribe_msg == view.getId()) {
+            int[] types = new int[] {-1, 0, 1, 2};
+            reloadClusterMarker(types[new Random().nextInt(4)]);
         } else if (R.id.rl_location == view.getId()) {
             startBaiDuMapLocation();
+        } else if (R.id.tv_subscribe_camera == view.getId()) {
+            startActivity(new Intent(mActivity, PoliceWalkTrackActivity.class));
         }
     }
 
@@ -408,7 +452,7 @@ public class FindMainFragment extends BaseFragment {
             //  MyLog.e(TAG, TAG + "地图加载完成---mMapView.getWidth()=" + mMapView.getWidth() + ", mMapView.getHeight()=" + mMapView.getHeight());
             MyLog.e(TAG, TAG + "地图加载完成");
             //必须在地图加载完后才能去设置，否则设置无效
-            mMapView.setZoomControlsPosition(new Point(UIUtils.dp2px(mContext, 306), UIUtils.dp2px(mContext, 416)));
+            mTextureMapView.setZoomControlsPosition(new Point(UIUtils.dp2px(mContext, 306), UIUtils.dp2px(mContext, 416)));
             UIUtils.setViewLayout(rlLocation, UIUtils.dp2px(mContext, 301), UIUtils.dp2px(mContext, 356));
         }
     };
@@ -421,7 +465,7 @@ public class FindMainFragment extends BaseFragment {
             MyLog.e(TAG, "定位结果回调 location = " + location);
             stopBaiDuMapLocation();
             startBDLocationTime = startBDLocationTime - 10000;
-            if (mMapView == null || mBaiduMap == null) {
+            if (mTextureMapView == null || mBaiduMap == null) {
                 return;
             }
             if (location == null) {
@@ -453,7 +497,7 @@ public class FindMainFragment extends BaseFragment {
                 }
 
                 MyLog.e(TAG, TAG + "---location.getLatitude() = " + location.getLatitude() + "  location.getLongitude() = " + location.getLongitude());
-                jumpToMapSpecifiedLocation(location);
+                BaiduMapManager.getInstance().jumpToMapSpecifiedLocation(mBaiduMap, location);
                 ShowToast.showToast(mContext, "地图定位成功 locType = " + location.getLocType());
             } else {
                 ShowToast.showToast(mContext, "地图定位失败，请检查网络：locType = " + location.getLocType());
@@ -501,26 +545,69 @@ public class FindMainFragment extends BaseFragment {
      * 每个Marker点，包含Marker点坐标以及图标  方便聚合功能使用
      */
     private class BaiDuMapMarkerItem implements ClusterItem {
-        private final LatLng mPosition;
+        private final int CAMERA_MARKER = 0;//镜头
+        private final int RED_ALARM_MARKER = 1;//警情
+        private final int POLICEMEN_MARKER = 2;//警员
+        private LatLng latlng;
+        private int markerType;
+        private String name;
+        private String num;
 
-        public BaiDuMapMarkerItem(LatLng latLng) {
-            mPosition = latLng;
+        public BaiDuMapMarkerItem(LatLng latlng) {
+            this.latlng = latlng;
+        }
+
+        public LatLng getLatlng() {
+            return latlng;
+        }
+
+        public void setLatlng(LatLng latlng) {
+            this.latlng = latlng;
+        }
+
+        public int getMarkerType() {
+            return markerType;
+        }
+
+        public void setMarkerType(int markerType) {
+            this.markerType = markerType;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getNum() {
+            return num;
+        }
+
+        public void setNum(String num) {
+            this.num = num;
         }
 
         @Override
         public LatLng getPosition() {
-            return mPosition;
+            return latlng;
         }
 
         @Override
         public BitmapDescriptor getBitmapDescriptor() {
-            return bitmapDescJuheMarker;
+            if (RED_ALARM_MARKER == markerType) {
+                return bitmapRedAlarmMarker;
+            } else if (POLICEMEN_MARKER == markerType) {
+                return bitmapPolicemenMarker;
+            }
+            return bitmapCameraMarker;
         }
     }
 
     @Override
     public void onDestroyView() {
-        MyLog.e(TAG, TAG + "---onDestroyView() mMapView = " + mMapView);
+        MyLog.e(TAG, TAG + "---onDestroyView() mTextureMapView = " + mTextureMapView);
         if (mBDLocationService != null) {
             mBDLocationService.unregisterListener(mBaiDuMapLocationListener);
             stopBaiDuMapLocation();
@@ -530,6 +617,7 @@ public class FindMainFragment extends BaseFragment {
             mBaiduMap.clear();
             // 关闭定位图层
             mBaiduMap.setMyLocationEnabled(false);
+            mBaiduMap.setOnMapLoadedCallback(null);
         }
 
         dismissXhProgressDialog(tipsAlertDialog);
@@ -539,11 +627,12 @@ public class FindMainFragment extends BaseFragment {
 
     @Override
     public void onDestroy() {
-        MyLog.e(TAG, TAG + "---onDestroy()  mMapView = " + mMapView);
-        if (mMapView != null) {
-            mMapView.onDestroy();
-            mMapView = null;
+        MyLog.e(TAG, TAG + "---onDestroy()  mTextureMapView = " + mTextureMapView);
+        if (mTextureMapView != null) {
+            mTextureMapView.onDestroy();
         }
         super.onDestroy();
+        mBaiduMap = null;
+        mTextureMapView = null;
     }
 }

@@ -1,7 +1,6 @@
 package third.zujian.hua.ui;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -26,7 +25,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
@@ -51,15 +49,13 @@ public class MainActivity extends BaseActivity implements HasSupportFragmentInje
     private MenuItem menuItem;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        initView();
-        Log.e(TAG, "onCreate: userBean = " + userBean + ", context = " + context);
+    protected int bindLayout() {
+        return R.layout.activity_main;
     }
 
-    private void initView() {
+    @Override
+    protected void initView() {
+        Log.e(TAG, "onCreate: userBean = " + userBean + ", context = " + context);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //设置底部导航栏菜单选项平均分布：如果Android28以上，调用：bottomNavigationView.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
         BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);

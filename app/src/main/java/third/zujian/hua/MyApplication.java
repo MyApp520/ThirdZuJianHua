@@ -12,6 +12,7 @@ import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.example.commonlib.base.BaseApplication;
 import com.example.commonlib.bean.UserBean;
+import com.example.commonlib.util.AppDebugUtil;
 
 import javax.inject.Inject;
 
@@ -46,6 +47,7 @@ public class MyApplication extends BaseApplication implements HasActivityInjecto
     @Override
     public void onCreate() {
         super.onCreate();
+        AppDebugUtil.syncIsDebug(getApplicationContext());
         DaggerAppComponent.builder().baseComponent(getBaseComponent()).build().inject(this);
         initBDMap();
         Log.e(TAG, "MyApplication onCreate: userBean = " + userBean);

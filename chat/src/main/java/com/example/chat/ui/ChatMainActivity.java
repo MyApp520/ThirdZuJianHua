@@ -1,13 +1,11 @@
 package com.example.chat.ui;
 
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.example.chat.R;
 import com.example.chat.R2;
 import com.example.commonlib.arouter.ArouterActionManager;
@@ -20,7 +18,6 @@ import com.example.commonlib.util.ShowToast;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
@@ -49,12 +46,13 @@ public class ChatMainActivity extends BaseActivity {
     UserBean userBean;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_main);
-        ButterKnife.bind(this);
-        ARouter.getInstance().inject(this);
-        Log.e(TAG, "onCreate: 主线程 = " + Thread.currentThread().getName() + ", id = " + Thread.currentThread().getId());
+    protected int bindLayout() {
+        return R.layout.activity_chat_main;
+    }
+
+    @Override
+    protected void initView() {
+
     }
 
     @Override

@@ -54,6 +54,7 @@ dependencies {
         exclude module: 'support-v4'
     }
     api rootProject.ext.dependencies["annotations"]
+    api rootProject.ext.dependencies["gson"]
 
     //引入fragmentation框架
     api(rootProject.ext.dependencies["fragmentation"]) {

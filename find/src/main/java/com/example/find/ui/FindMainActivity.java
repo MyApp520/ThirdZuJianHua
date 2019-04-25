@@ -1,6 +1,5 @@
 package com.example.find.ui;
 
-import android.os.Bundle;
 import android.util.Log;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -20,9 +19,13 @@ public class FindMainActivity extends BaseActivity {
     UserBean userBean;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_find_main);
+    protected int bindLayout() {
+        return R.layout.activity_find_main;
+    }
+
+    @Override
+    protected void initView() {
+
     }
 
     @Override
