@@ -1,8 +1,10 @@
 package com.example.find.ui.activity;
 
 
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.View;
 
 import com.baidu.BaiduMapManager;
 import com.baidu.mapapi.map.BaiduMap;
@@ -15,11 +17,13 @@ import com.example.commonlib.base.BaseActivity;
 import com.example.commonlib.util.MyLog;
 import com.example.find.R;
 import com.example.find.R2;
+import com.example.find.ui.fragment.MapBottomSheetFragmentThird;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,10 +84,30 @@ public class PoliceWalkTrackActivity extends BaseActivity {
         mBaiduMap = BaiduMapManager.getInstance().initBaiduMapView(walkTraceMapview, mBaiDuMapLoadedCallback);
     }
 
+    private void showMapBottomSheetFragment() {
+//        MapBottomSheetFragment mapBottomSheetFragment = new MapBottomSheetFragment();
+//        mapBottomSheetFragment.setTopOffset(250);
+//        mapBottomSheetFragment.show(getSupportFragmentManager(), "MapBottomSheetFragment");
+
+//        MapBottomSheetFragmentSecond mapBottomSheetFragmentSecond = new MapBottomSheetFragmentSecond();
+//        mapBottomSheetFragmentSecond.setTopOffset(250);
+//        mapBottomSheetFragmentSecond.show(getSupportFragmentManager(), "mapBottomSheetFragmentSecond");
+
+        DialogFragment dialogFragment = new MapBottomSheetFragmentThird();
+        dialogFragment.show(getSupportFragmentManager(), "MapBottomSheetFragmentThird");
+    }
+
+    @OnClick({R2.id.btn_query_track})
+    public void onViewClicked(View view) {
+        if (R.id.btn_query_track == view.getId()) {
+            showMapBottomSheetFragment();
+        }
+    }
+
     private BaiduMap.OnMapLoadedCallback mBaiDuMapLoadedCallback = new BaiduMap.OnMapLoadedCallback() {
         @Override
         public void onMapLoaded() {
-            BaiduMapManager.getInstance().goToTargetLocation(mBaiduMap, walkTrackLatlngList.get(0), 20.0f);
+            BaiduMapManager.getInstance().goToTargetLocation(mBaiduMap, walkTrackLatlngList.get(0), 16.0f);
             //设置折线的属性
             OverlayOptions mOverlayOptions = new PolylineOptions()
                     .width(10)

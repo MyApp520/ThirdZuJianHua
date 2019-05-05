@@ -26,9 +26,9 @@ ext {
             "appcompat-v7"                 : "com.android.support:appcompat-v7:${versions["androidSupportSdkversions"]}",
             "design"                       : "com.android.support:design:27.0.1",
             "support-v4"                   : "com.android.support:support-v4:${versions["androidSupportSdkversions"]}",
-            "cardview-v7"                  : "com.android.support:cardview-v7:${versions["androidSupportSdkversions"]}",
             "annotations"                  : "com.android.support:support-annotations:${versions["androidSupportSdkversions"]}",
             "recyclerview-v7"              : "com.android.support:recyclerview-v7:${versions["androidSupportSdkversions"]}",
+            "cardview-v7"                  : "com.android.support:cardview-v7:${versions["androidSupportSdkversions"]}",
 
             //fragmentation框架
             "fragmentation"                : "me.yokeyword:fragmentation:1.3.6",
@@ -56,7 +56,7 @@ ext {
             "nineoldandroids"              : "com.nineoldandroids:library:2.4.0",
             "paginate"                     : "com.github.markomilos:paginate:0.5.1",
             "vlayout"                      : "com.alibaba.android:vlayout:1.1.0@aar",
-            "BaseRecyclerViewAdapterHelper": "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.22",
+            "BaseRecyclerViewAdapterHelper": "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30",
             "flyco"                        : "com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar",
 
             //rx1

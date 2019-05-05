@@ -2,5 +2,8 @@
     <string name="find_module_name">FindMainFragment</string>
 
     <!-- TODO: Remove or change this placeholder text -->
+    <string name="query_policemen_track">轨迹查询</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

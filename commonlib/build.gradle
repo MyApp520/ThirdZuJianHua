@@ -54,7 +54,10 @@ dependencies {
         exclude module: 'support-v4'
     }
     api rootProject.ext.dependencies["annotations"]
+    api rootProject.ext.dependencies["recyclerview-v7"]
+    api rootProject.ext.dependencies["cardview-v7"]
     api rootProject.ext.dependencies["gson"]
+    api rootProject.ext.dependencies["BaseRecyclerViewAdapterHelper"]
 
     //引入fragmentation框架
     api(rootProject.ext.dependencies["fragmentation"]) {

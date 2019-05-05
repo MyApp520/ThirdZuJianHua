@@ -36,6 +36,7 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
+            res.srcDirs = ['src/main/res']
 
             if (isNeedChatModule.toBoolean()) {
                 manifest.srcFile 'src/main/debug/AndroidManifest.xml'
@@ -63,6 +64,7 @@ dependencies {
     implementation project(':bdmaplibrary')
 
     // 引入butterknife
+    implementation 'com.android.support:support-v4:27.1.1'
     annotationProcessor(rootProject.ext.dependencies["butterknife-compiler"]) {
         exclude group: 'support-annotations'
         exclude group: 'support-v7'

@@ -5,8 +5,12 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="red">#ff0000</color>
+    <color name="yellow">#fff000</color>
 
     <color name="tab_checked">#FF4081</color>
     <color name="tab_unchecked">#3F51B5</color>
     <color name="backgroup">#12b7f5</color>
+    <color name="transparent">#00000000</color>
 </resources>

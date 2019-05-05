@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -48,11 +49,11 @@ import com.example.commonlib.util.UIUtils;
 import com.example.find.R;
 import com.example.find.R2;
 import com.example.find.ui.activity.PoliceWalkTrackActivity;
+import com.example.find.ui.fragment.MapBottomSheetFragmentThird;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -426,8 +427,10 @@ public class FindMainFragment extends BaseFragment {
     @OnClick({R2.id.tv_subscribe_msg, R2.id.rl_location, R2.id.tv_subscribe_camera})
     public void onViewClicked(View view) {
         if (R.id.tv_subscribe_msg == view.getId()) {
-            int[] types = new int[] {-1, 0, 1, 2};
-            reloadClusterMarker(types[new Random().nextInt(4)]);
+//            int[] types = new int[] {-1, 0, 1, 2};
+//            reloadClusterMarker(types[new Random().nextInt(4)]);
+            DialogFragment dialogFragment = new MapBottomSheetFragmentThird();
+            dialogFragment.show(getChildFragmentManager(), "MapBottomSheetFragmentThird");
         } else if (R.id.rl_location == view.getId()) {
             startBaiDuMapLocation();
         } else if (R.id.tv_subscribe_camera == view.getId()) {
